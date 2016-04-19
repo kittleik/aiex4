@@ -1,0 +1,1 @@
+metoder i AI
