@@ -1,4 +1,4 @@
-from ramdom import random
+from random import random,randint,shuffle
 
 def get_random_importance(length):
     res = []
@@ -12,13 +12,27 @@ def text_to_datalist(path):
         x = line.split("\t")
         x[-1] = x[-1][0]
         for i in range(len(x)):
-            x[i] = int(x[i]-1)
+            x[i] = int(x[i])-1
         test_data.append(x)
     return test_data
 
+class Tree(object):
 
+    def __init__(self, root):
+        self.root = root
+        self.v = [None,None]
 
-def decision_tree_learning(examples, attributes, parent_examples):
+    def add_branch(self, vk, subtree):
+        self.v[vk] = subtree
+
+    def feed_tree(self, inputen):
+        inp = inputen[:]
+        value = inp.pop()
+        if type(self.v[value])== Tree:
+            return self.v[value].feed_tree(inp)
+        return self.v[value]
+
+def decision_tree_learning(examples, attributes, parent_examples=None):
     examples = examples[:]
 
     if examples==[]:
@@ -35,15 +49,52 @@ def decision_tree_learning(examples, attributes, parent_examples):
         tree = Tree(A)
         for vk in [0,1]:
             exs = []
-            for
+            for e in examples:
+                if e[A] == vk:
+                    exs.append(e)
 
+            subtree = decision_tree_learning(exs, attributes, examples)
+            tree.add_branch(vk, subtree)
+        return tree
 
+def plurality_value(li):
+    zum = 0
+    for data in li:
+        zum += data[7]
+    if zum > len(li)/2:
+        return 1
+    if zum < len(li)/2:
+        return 0
+    if zum == len(li)/2:
+        return randint(0,1)
+
+def same_class(li):
+    unique = li[0][7]
+    for data in li:
+        if data[7] != unique:
+            return False
+    return True
+
+def test_tree(tree,test_data):
+    score = 0
+    for data in test_data:
+        if tree.feed_tree(data[:-1])==data[-1]:
+            score +=1
+
+    return score
  #----------------------------------------------------------------------------------------------------------
 
+examples = text_to_datalist("data/training.txt")
+test_data = text_to_datalist("data/test.txt")
 
-print(text_to_datalist("data/test.txt"))
+random_importance = [i for i in range(7)]
+shuffle(random_importance)
+print(random_importance)
 
-
+a = decision_tree_learning(examples,random_importance)
+score = test_tree(a,test_data)
+print(a.feed_tree([0,1,0,0,1,1,0]))
+print (score)
 
 
 """
