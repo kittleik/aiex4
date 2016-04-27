@@ -1,14 +1,51 @@
-f = open("data/test.txt","r")
-a = f.readline().split("\t")
-test_data = []
-for line in f.readlines():
-    x = line.split("\t")
-    x[-1] = x[-1][0]
-    for i in range(len(x)):
-        x[i] = int(x[i])
-    test_data.append(x)
+from ramdom import random
 
-print(test_data)
+def get_random_importance(length):
+    res = []
+
+
+def text_to_datalist(path):
+    f = open(path, "r")
+    a = f.readline().split("\t")
+    test_data = []
+    for line in f.readlines():
+        x = line.split("\t")
+        x[-1] = x[-1][0]
+        for i in range(len(x)):
+            x[i] = int(x[i]-1)
+        test_data.append(x)
+    return test_data
+
+
+
+def decision_tree_learning(examples, attributes, parent_examples):
+    examples = examples[:]
+
+    if examples==[]:
+        return plurality_value(parent_examples)
+
+    elif  same_class(examples):
+        return same_class(examples)
+
+    elif attributes == []:
+        return plurality_value(examples)
+
+    else:
+        A = attributes.pop()
+        tree = Tree(A)
+        for vk in [0,1]:
+            exs = []
+            for
+
+
+ #----------------------------------------------------------------------------------------------------------
+
+
+print(text_to_datalist("data/test.txt"))
+
+
+
+
 """
 function DECISION-TREE-LEARNING(examples, attributes, parent examples) returns
 a tree
@@ -23,4 +60,4 @@ a tree
             subtree ← DECISION-TREE-LEARNING(exs, attributes − A, examples)
             add a branch to tree with label (A = vk) and subtree subtree
         return tree
-""""
+"""
