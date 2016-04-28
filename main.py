@@ -1,8 +1,8 @@
 from random import random,randint,shuffle
+import math
 
 def get_random_importance(length):
     res = []
-
 
 def text_to_datalist(path):
     f = open(path, "r")
@@ -32,6 +32,15 @@ class Tree(object):
             return self.v[value].feed_tree(inp)
         return self.v[value]
 
+    def print_tree(self):
+        print(self.root, "parent: ")
+        for node in self.v:
+            if (type(node)!=Tree):
+                print(node)
+            else:
+                print(node.root)
+                node.print_tree()
+
 def decision_tree_learning(examples, attributes, parent_examples=None):
     examples = examples[:]
 
@@ -45,9 +54,12 @@ def decision_tree_learning(examples, attributes, parent_examples=None):
         return plurality_value(examples)
 
     else:
-        A = attributes.pop()
+        #shuffle(attributes)
+        #A = attributes.pop()
+        A = attributes.pop(importance(examples,attributes))
+
         tree = Tree(A)
-        for vk in [0,1]:
+        for vk in [1,0]:
             exs = []
             for e in examples:
                 if e[A] == vk:
@@ -82,16 +94,63 @@ def test_tree(tree,test_data):
             score +=1
 
     return score
+
+def entropy(examples, target_attr):
+
+    ones = 0
+    zeroes = 0
+    data_entropy = 0.0
+
+    for exs in examples:
+        if exs[target_attr]:
+            ones += 1
+        else:
+            zeroes += 1
+
+    data_entropy+= (-ones/len(examples))*math.log(ones/len(examples),2)
+    data_entropy+= (-zeroes/len(examples))*math.log(zeroes/len(examples),2)
+    return data_entropy
+
+def gain(data, target_attr):
+
+        ones = 0
+        zeroes = 0
+        data_entropy = 0.0
+
+        for exs in data:
+            if exs[target_attr]:
+                ones += 1
+            else:
+                zeroes += 1
+
+        ones_prob = ones/len(data)
+        zeroes_prob = zeroes/len(data)
+
+        ones_subset = [exs for exs in data if exs[target_attr] == 1]
+        zeroes_subset = [exs for exs in data if exs[target_attr]==0]
+
+        ones_entropy = ones_prob*entropy(ones_subset, target_attr)
+        zeroes_entropy = zeroes_prob*entropy(zeroes_subset, target_attr)
+
+        subset_entropy = ones_entropy+zeroes_entropy
+        print (subset_entropy)
+        return (entropy(data, target_attr)-subset_entropy)
+
+def importance(data, attributes):
+    imp_list = []
+    for i, attr in enumerate(attributes):
+        imp_list.append((gain(data,attr),i))
+    return max(imp_list)[1]
  #----------------------------------------------------------------------------------------------------------
 
 examples = text_to_datalist("data/training.txt")
 test_data = text_to_datalist("data/test.txt")
 
-random_importance = [i for i in range(7)]
-shuffle(random_importance)
-print(random_importance)
+attributes = [i for i in range(7)]
 
-a = decision_tree_learning(examples,random_importance)
+a = decision_tree_learning(examples,attributes)
 score = test_tree(a,test_data)
-print(a.feed_tree([0,1,0,0,1,1,0]))
+#a.print_tree()
+
+print(a.feed_tree([1,0,1,0,0,0,0]))
 print (score)
